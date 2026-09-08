@@ -10,6 +10,7 @@ def formar_intervalos(lista_tuplas):
     h_tupla, m_tupla = zip(*puntos)
     h_array = np.array(h_tupla)
     m_array = np.array(m_tupla)
+    m_array = np.clip(m_array, a_min=0, a_max=None)
     return h_array, m_array
 
 
@@ -38,9 +39,4 @@ def ColorSaturationHSV(file: str, lista_tuplas):
     nuevo_S = gm_S(saturacion, interpolada)
     imagen_hsv[:, :, 1] = nuevo_S
     imagen_rgb = color.hsv2rgb(imagen_hsv)
-    plt.imshow(imagen_rgb)
-    plt.show()
     return imagen_rgb
-
-
-ColorSaturationHSV("test_image.png", [(0.166, 0), (1, 7), (0.666, 0)])
