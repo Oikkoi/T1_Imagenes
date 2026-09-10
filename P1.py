@@ -70,17 +70,20 @@ def ColorSaturationLCH(file: str, lista_tuplas):
 
 
 def ColorSaturation(mode: str, file: str, lista_pares):
-    if mode == "HS":
+    mode.lower()
+    if mode == "hsv":
         imagen_rgb = ColorSaturationHSV(file, lista_pares)
-    else:
+    elif mode == "lch":
         imagen_rgb = ColorSaturationLCH(file, lista_pares)
+    else:
+        raise "Modo inválido, reintentar."
     plt.imshow(imagen_rgb)
     plt.imsave("resultado.png", imagen_rgb)
     plt.show()
 
 
 if __name__ == "__main__":
-    mode = "LCH"  # HS para HSV, cualquier otra cosa para LCH
+    mode = input("Ingresa el modo deseado")  # HSV para HSV, LCH para LCH
     imagen = "test_image2.jpg"
-    lista_pares = [(0, 1), (np.pi/2, 1), (np.pi, 1), (3*np.pi/4, 1)]
+    lista_pares = [(0, 0.5), (0.333, 0), (0.666, 2)]
     ColorSaturation(mode, imagen, lista_pares)
