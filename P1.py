@@ -29,6 +29,12 @@ def ColorSaturationHSV(file: str, lista_tuplas):
 
     # Definimos los tensores de RGB Y HSV
     imagen_rgb = io.imread(file)
+    # Si la imagen está en escala de grises:
+    if len(imagen_rgb.shape) == 2:
+        imagen_rgb = color.gray2rgb(imagen_rgb)
+    # Validar si es rgba:
+    elif imagen_rgb.shape[2] == 4:
+        imagen_rgb = color.rgba2rgb(imagen_rgb)
     imagen_hsv = color.rgb2hsv(imagen_rgb)
 
     # definimos el hue y la saturacion:
@@ -55,6 +61,10 @@ def ColorSaturationLCH(file: str, lista_tuplas):
 
     # Definimos los tensores de RGB Y HSV
     imagen_rgb = io.imread(file)
+    if len(imagen_rgb.shape) == 2:
+        imagen_rgb = color.gray2rgb(imagen_rgb)
+    elif len(imagen_rgb.shape) == 4:
+        imagen_rgb = color.rgba2rgb(imagen_rgb)
     imagen_cie = color.rgb2lab(imagen_rgb)
     imagen_lch = color.lab2lch(imagen_cie)
 
@@ -69,7 +79,7 @@ def ColorSaturationLCH(file: str, lista_tuplas):
     return imagen_rgb
 
 
-def ColorSaturation(mode: str, file: str, lista_pares):
+def ColorSaturation(mode: str, file: str, lista_pares, nombre_archivo=None):
     mode = mode.lower()
     if mode == "hsv":
         imagen_rgb = ColorSaturationHSV(file, lista_pares)
@@ -77,13 +87,14 @@ def ColorSaturation(mode: str, file: str, lista_pares):
         imagen_rgb = ColorSaturationLCH(file, lista_pares)
     else:
         raise "Modo inválido, reintentar."
+    if nombre_archivo is not None:
+        plt.imsave(nombre_archivo, imagen_rgb)
     plt.imshow(imagen_rgb)
-    plt.imsave("resultado.png", imagen_rgb)
     plt.show()
 
 
 if __name__ == "__main__":
-    mode = input("Ingresa el modo deseado")  # HSV para HSV, LCH para LCH
-    imagen = "test_image.png"
+    mode = input("Ingresa el modo deseado: ")  # HSV para HSV, LCH para LCH
+    imagen = "Test_Images/im_espectro_color.jpg"
     lista_pares = [(0, 0.5), (0.333, 0), (0.666, 2)]
-    ColorSaturation(mode, imagen, lista_pares)
+    ColorSaturation(mode, imagen, lista_pares, "hola.png")

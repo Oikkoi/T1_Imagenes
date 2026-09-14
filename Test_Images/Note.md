@@ -1,0 +1,1 @@
+Esta carpeta (Test_Images) contiene además los archivos .tif que subió el profesor a Canvas. Están incluidos en el .gitignore porque consumen demasiado espacio
