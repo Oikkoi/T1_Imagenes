@@ -1,8 +1,6 @@
 .venv/
 test.py
 enunciado.pdf
-test_image.png
-test_image2.jpg
 resultado.png
-test_image.jpeg
 __pycache__/
+Test_Images/
