@@ -79,7 +79,7 @@ def ColorSaturationLCH(file: str, lista_tuplas):
     return imagen_rgb
 
 
-def ColorSaturation(mode: str, file: str, lista_pares, nombre_archivo=None):
+def ColorSaturation(mode: str, file: str, lista_pares, nombre_archivo=None, mostrar=False):
     mode = mode.lower()
     if mode == "hsv":
         imagen_rgb = ColorSaturationHSV(file, lista_pares)
@@ -89,8 +89,9 @@ def ColorSaturation(mode: str, file: str, lista_pares, nombre_archivo=None):
         raise "Modo inválido, reintentar."
     if nombre_archivo is not None:
         plt.imsave(nombre_archivo, imagen_rgb)
-    plt.imshow(imagen_rgb)
-    plt.show()
+    if mostrar:
+        plt.imshow(imagen_rgb)
+        plt.show()
 
 
 if __name__ == "__main__":
