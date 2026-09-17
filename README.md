@@ -62,7 +62,11 @@ Al final del archivo (desde la línea 113) se encuentran los parámetros modific
 
 `nombre_imagen` es un string con el nombre del archivo con su respectiva extensión. Ejemplo: `"P2_IMG_2423.tif"`
 
-tamaño_segmento` es un int con el tamaño deseado de cada región. Por ejemplo: `128`, `64`, `100000`, etc
+`tamaño_segmento` es un int con el tamaño deseado de cada región. Por ejemplo: `128`, `64`, `100000`, etc.
+
+`overlap` es el float que corresponde al valor porcentual deseado para la superposición entre segmentos. Por ejemplo, `25%` de superposición deseada corresponde a `0.25`
+
+`factor_limite` es un float con el factor de escalamiento que se usará para cortar el histograma, si es que se define y es distinto de 0.
 
 
 ###### Enlace al repo: [Enlace](https://github.com/Oikkoi/T1_Imagenes.git)
