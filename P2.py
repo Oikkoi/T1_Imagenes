@@ -17,12 +17,14 @@ def convertir_a_gray(dir_file: str):
 
 
 def calcular_salto(tamaño_region: int, overlap_deseado: float):
-    if overlap_deseado >= 1:
+    if overlap_deseado >= 1 or overlap_deseado < 0:
         raise ValueError(
             "Se espera que el overlap deseado sea un valor entre 0 y 1")
     overlap_pixeles = tamaño_region * overlap_deseado
-    salto = tamaño_region - overlap_pixeles
-    return int(salto)
+    salto = int(tamaño_region - overlap_pixeles)
+    if salto == 0:
+        salto = 1
+    return salto
 
 
 def extraer_segmentos(imagen, tamaño_region: int, overlap_deseado: float):
@@ -38,20 +40,23 @@ def extraer_segmentos(imagen, tamaño_region: int, overlap_deseado: float):
             yield segmento, (b_sup, b_inf, b_izq, b_der), (x, y)
 
 
-def obtener_transformacion(segmento, factor_limite: float):
-    histograma, bins = np.histogram(segmento, bins=256, range=(0, 256))
+def obtener_transformacion(segmento, factor_limite: float, num_bins=256):
+    histograma, bordes = np.histogram(segmento, bins=num_bins, range=(0, 256))
     if factor_limite is not None:
         alto, ancho = segmento.shape
-        promedio = (alto * ancho) / 256
+        promedio = (alto * ancho) / num_bins
         limite_real = int(promedio * factor_limite)
         histograma_cortado = np.clip(histograma, 0, limite_real)
     else:
-        histograma_cortado = histograma  # Ecualización sin límite
+        histograma_cortado = histograma
     diferencia = histograma - histograma_cortado
     exceso = np.sum(diferencia)
-    histograma_redistribuido = histograma_cortado + (exceso/256)
+    histograma_redistribuido = histograma_cortado + (exceso / num_bins)
     cdf = np.cumsum(histograma_redistribuido)
-    cdf_normalizada = np.round(cdf * 255 / cdf.max()).astype(np.uint8)
+    if cdf.max() > 0:
+        cdf_normalizada = np.round(cdf * 255 / cdf.max()).astype(np.uint8)
+    else:
+        cdf_normalizada = np.zeros_like(cdf, dtype=np.uint8)
     return cdf_normalizada
 
 
@@ -87,6 +92,7 @@ def mostrar_comparacion(imagen_inicial, imagen_final, tamaño_region):
     ax4.axis("off")
     plt.tight_layout()
     plt.show()
+    return imagen_eq_global, imagen_final
 
 
 def ecualizacion_local(file, tamaño_region, overlap_deseado, factor_limite=None):
@@ -106,8 +112,8 @@ def ecualizacion_local(file, tamaño_region, overlap_deseado, factor_limite=None
         lienzo_segmentos[b_sup:b_inf, b_izq:b_der] += segmento_ponderado
         lienzo_pesos[b_sup:b_inf, b_izq:b_der] += mascara_peso_ponderado
     lienzo_pesos = np.maximum(lienzo_pesos, 1)
-    imagen_final = (lienzo_segmentos // lienzo_pesos).astype(np.uint8)
-    mostrar_comparacion(imagen_gray, imagen_final, tamaño_region)
+    imagen_final = np.round((lienzo_segmentos / lienzo_pesos)).astype(np.uint8)
+    return mostrar_comparacion(imagen_gray, imagen_final, tamaño_region)
 
 
 if __name__ == "__main__":
@@ -116,10 +122,6 @@ if __name__ == "__main__":
     file = ruta + nombre_imagen
 
     tamaño_segmento = 128
-    overlap = 0.5
+    overlap = 0.8
     factor_limite = 55
-    """
-    Si mantenemos el overlap de 0.5, con el factor limite de 26.875 tendremos algo igual a la ecualización global
-    de Skimage. Mientras que 55 hará que se vea igual al CLAHE de Skimage
-    """
     ecualizacion_local(file, tamaño_segmento, overlap, factor_limite)
