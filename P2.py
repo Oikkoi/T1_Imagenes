@@ -89,11 +89,11 @@ def mostrar_comparacion(imagen_inicial, imagen_final, tamaño_region):
     plt.show()
 
 
-def ecualizacion_local(file, tamaño_region, overlap_deseado, factor_limite):
+def ecualizacion_local(file, tamaño_region, overlap_deseado, factor_limite=None):
     imagen_gray = convertir_a_gray(file)
     lienzo_pesos = np.zeros(imagen_gray.shape)
     lienzo_segmentos = np.zeros(imagen_gray.shape)
-    if factor_limite == 0:
+    if factor_limite == 0 or factor_limite == 0.0:
         factor_limite = None
     for segmento, (b_sup, b_inf, b_izq, b_der), (x, y) in extraer_segmentos(
             imagen_gray, tamaño_region, overlap_deseado):
