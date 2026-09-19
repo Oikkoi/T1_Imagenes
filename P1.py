@@ -24,7 +24,7 @@ def gm_S(S, matriz_multiplicar):
     return np.clip(S * matriz_multiplicar, 0, 1)
 
 
-def ColorSaturationHSV(file: str, lista_tuplas):
+def ColorSaturationHSV(file: str, lista_tuplas, pixel_debug=None):
     h_array, m_array = formar_intervalos(lista_tuplas)
 
     # Definimos los tensores de RGB Y HSV
@@ -36,15 +36,23 @@ def ColorSaturationHSV(file: str, lista_tuplas):
     elif imagen_rgb.shape[2] == 4:
         imagen_rgb = color.rgba2rgb(imagen_rgb)
     imagen_hsv = color.rgb2hsv(imagen_rgb)
-
+    saturacion_original = imagen_hsv[:, :, 1].copy()
     # definimos el hue y la saturacion:
     hue = imagen_hsv[:, :, 0]
     saturacion = imagen_hsv[:, :, 1]
 
     interpolada = Interpolacion_HSV(hue, h_array, m_array)
     nuevo_S = gm_S(saturacion, interpolada)
+    if pixel_debug is not None:
+        x, y = pixel_debug
+        print(f"Tono h original: {hue[y, x]}")
+        print(f"Saturación original S: {saturacion_original[y, x]}")
+        print(f"Valor interpolado m(h): {interpolada[y, x]}")
+        print(f"Resultado g_m(S): {nuevo_S[y, x]}")
     imagen_hsv[:, :, 1] = nuevo_S
     imagen_rgb = color.hsv2rgb(imagen_hsv)
+    if pixel_debug is not None:
+        print(f"RGB final normalizado: {imagen_rgb[y, x]}")
     return imagen_rgb
 
 
@@ -56,7 +64,7 @@ def gm_C(C, matriz_multiplicar):
     return np.clip(C*matriz_multiplicar, a_min=0, a_max=None)
 
 
-def ColorSaturationLCH(file: str, lista_tuplas):
+def ColorSaturationLCH(file: str, lista_tuplas, pixel_debug: None):
     h_array, m_array = formar_intervalos(lista_tuplas)
 
     # Definimos los tensores de RGB Y HSV
@@ -70,12 +78,21 @@ def ColorSaturationLCH(file: str, lista_tuplas):
 
     hue = imagen_lch[:, :, 2]
     croma = imagen_lch[:, :, 1]
+    croma_original = imagen_lch[:, :, 1].copy()
 
     interpolada = Interpolacion_LCH(hue, h_array, m_array)
     nuevo_C = gm_C(croma, interpolada)
+    if pixel_debug is not None:
+        x, y = pixel_debug
+        print(f"Tono h* original: {hue[y, x]}")
+        print(f"Croma original c*: {croma_original[y, x]}")
+        print(f"Valor interpolado m(h*): {interpolada[y, x]}")
+        print(f"Resultado g_m(c*): {nuevo_C[y, x]}")
     imagen_lch[:, :, 1] = nuevo_C
     imagen_lab = color.lch2lab(imagen_lch)
     imagen_rgb = color.lab2rgb(imagen_lab)
+    if pixel_debug is not None:
+        print(f"RGB final normalizado: {imagen_rgb[y, x]}")
     return imagen_rgb
 
 
@@ -94,8 +111,29 @@ def ColorSaturation(mode: str, file: str, lista_pares, nombre_archivo=None, most
         plt.show()
 
 
+def ColorSaturationPixel(mode, file, lista_tuplas, pixel: tuple):
+    x, y = pixel
+    imagen_original = io.imread(file)
+    mode = mode.lower()
+    if mode == "hsv":
+        imagen_rgb = ColorSaturationHSV(file, lista_tuplas, pixel)
+    elif mode == "lch":
+        imagen_rgb = ColorSaturationLCH(file, lista_tuplas, pixel)
+    else:
+        raise ValueError("Modo inválido, reintentar.")
+    pixel_original = imagen_original[y, x]
+    pixel_modificado = imagen_rgb[y, x] * 255
+    pixel_original = np.array([[pixel_original]])
+    pixel_modificado = np.array([[pixel_modificado]])
+    pixel_modificado = np.clip(pixel_modificado, 0, 255).astype(np.uint8)
+    io.imsave(f"P1_pixel_original_{mode}.png", pixel_original)
+    io.imsave(f"P1_pixel_modificado_{mode}.png", pixel_modificado)
+    return
+
+
 if __name__ == "__main__":
-    mode = input("Ingresa el modo deseado: ")  # HSV para HSV, LCH para LCH
+    mode = "hsv"  # HSV para HSV, LCH para LCH
     imagen = "Test_Images/im_espectro_color.jpg"
-    lista_pares = [(0, 0.5), (0.333, 0), (0.666, 2)]
-    ColorSaturation(mode, imagen, lista_pares, "hola.png")
+    lista_pares = [(0, 1), (1/3, 0.4), (2/3, 1)]
+    # lista_pares = [(0.7, 1), (1.64, 1), (2.37, 0.4), (5.34, 1)]
+    ColorSaturationPixel(mode, imagen, lista_pares, (550, 550))
