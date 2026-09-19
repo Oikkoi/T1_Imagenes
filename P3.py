@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from skimage import io, color
+from skimage import io, color, img_as_ubyte
 
 
 def convertir_a_rgb(file: str, tipo: str):  # Cubre RGB, HSV, HSL, HSI y GrayScale
@@ -17,13 +17,15 @@ def convertir_a_rgb(file: str, tipo: str):  # Cubre RGB, HSV, HSL, HSI y GraySca
         imagen_rgb = color.hsi2rgb(imagen_og)
     elif tipo == "GRAYSCALE":
         imagen_rgb = color.gray2rgb(imagen_og)
+    elif tipo == "RGBA":
+        imagen_rgb = color.rgba2rgb(imagen_og)
     else:
         raise ValueError(
             "El tipo de imagen no es RGB, HSV, HSL, HSI ni GrayScale")
-    return imagen_rgb
+    return img_as_ubyte(imagen_rgb)
 
 
-def generar_lienzo_salida(s: float, imagen_original):
+def generar_lienzo_salida(s: float, imagen_original, tipo="rgb"):
     alto_og, ancho_og, _ = imagen_original.shape
     y_max, x_max = (int(np.ceil(alto_og*s)), int(np.ceil(ancho_og*s)))
     return np.zeros((y_max, x_max, 3)), (x_max, y_max)

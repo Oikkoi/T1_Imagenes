@@ -54,9 +54,8 @@ def varios_s(valores_S: tuple, imagen="P3_IMG_2387_crop.tif"):
 # Exp 2: Comparar vecino y bilineal
 
 
-def varios_test(imagenes: tuple, varios_s=(0.3, 1.5)):
+def varios_test(imagenes: tuple, varios_s=(0.3, 1.5), tipo_imagen="rgb"):
     ruta = "Test_Images/"
-    tipo_imagen = "rgb"
     modos = ("vecino", "bilineal")
     for imagen in imagenes:
         print(f"{"\n" * 100} TRABAJANDO IMAGEN {imagen}")
@@ -66,8 +65,11 @@ def varios_test(imagenes: tuple, varios_s=(0.3, 1.5)):
             for modo in modos:
                 imagen_escalada, imagen_original = reescalamiento(
                     s, file, tipo_imagen, modo)
+                del imagen_original
                 io.imsave(
                     f"{imagen.split(".")[0]}_{modo}_{s}.tif", imagen_escalada)
+                del imagen_escalada
+                gc.collect()
 
 # varios_test(("im_bicipuerta.avif", "P3_IMG_2387_crop.tif", "im_cocina.jpg"))
 
@@ -154,5 +156,11 @@ def perdida(imagen: str):
             gc.collect()
 
 
+"""
 for imagen in ("im_venecia.avif", "im_cocina.jpg", "im_ciudad.jpg"):
     perdida(imagen)
+"""
+
+# Exp 8:
+varios_test(("im_ciudad_ruido.png", "raiseerror"),
+            (0.3, 0.5, 1.5, 1.7), "rgba")
