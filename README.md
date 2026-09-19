@@ -91,4 +91,16 @@ Se definieron las funciones:
     - Vecino: Se extrae los pixeles promediados x_p, y_p y se asigna el mismo color de la imagne en x_p, y_p al lienzo en x, y
 - Finalmente, se retorna el lienzo vacío usando `.astype(np.uint8)` y la imagen original
 
-###### Enlace al repo: [Enlace](https://github.com/Oikkoi/T1_Imagenes.git)
+## Uso de `P3.py`
+
+A partir de la línea 100 empieza el ejecutable en `P3.py`. Para modificarlo, se espera la modificación de las siguientes variables:
+
+- `ruta`: Corregir `\` por `/` según el sistema operativo. También, renombrar la ruta **relativa a P3.py** según donde estén las imágenes para probar.
+
+- `imagen`: Cambiar el string asignado por el nombre (con su extensión) de la imagen.
+
+- `s`: el factor de escalamiento.
+
+- `tipo_imagen`: Un string con el tipo de imagen, están soportados los soportados por *convertir_a_gray()*
+
+- `modo_interpolacion` = se espera `"vecino"` o `"bilineal"`
