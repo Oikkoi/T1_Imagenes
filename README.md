@@ -69,4 +69,26 @@ Al final del archivo (desde la línea 113) se encuentran los parámetros modific
 `factor_limite` es un float con el factor de escalamiento que se usará para cortar el histograma, si es que se define y es distinto de 0.
 
 
+# P3 (`P3.py`):
+**Para hacer esta parte, se utilizaron las librerías `numpy`, `matplotlib.pyplot` y `skimage`.**
+
+Se definieron las funciones:
+1. *convertir_a_rgb*: recibe la dirección de la imagen y el tipo de imagen como argumento. Luego retorna la imagen como `ubyte8` (del módulo `skimage`). Soporta RGB, HSV, HSL, HSI y GrayScale. Para hacerlo, utiliza `io.imread()` de `skimage` para convertir la dirección en el tensor de imagen, y `color` y las funciones de conversión:
+    - `color.hsv2rgb`
+    - `color.hsl2rgb`
+    - `color.hsi2rgb`
+    - `color.gray2rgb`
+    - `color.rgba2rgb`
+
+2. *generar_lienzo_salida*: Recibe el factor del escalamiento **s** y la imagen original (RGB). Utiliza el método `.shape` en la imagen original para extraer el alto y ancho de la imagen. Luego, usa la función `np.ceil` de esas dimensiones escaladas por **s**, ambas redondeadas por la función `int()` Retorna un tensor de ceros con `np.zeros` de las mismas dimensiones a las escaladas y los tres canales de color. También la tupla de dimensiones de la imagen.
+
+3. *mapeo_inverso*: Recibe la tupla de coordenadas actuales (en el lienzo reescalado) y el factor de escalamiento s. Calcula las posiciones en el lienzo original al dividir por s, retorna el par de coordenadas calculadas.
+
+4. *calcular_nuevas_coordenadas*: recibe el tamaño máximo de la imagen original, el factor de escalamiento s, las coordenadas actuales (en el nuevo lienzo) y el modo de uso. Llama a *mapeo_inverso* para obtener el par x, y de coordenadas actuales (en la imagen original). Si el modo es `"vecino"`, el par de pixeles que se deben usar solamente es el mínimo (convertido en entero) entre x redondeado y x máximo de la imagen original. Es análogo para y. Si el modo es `"bilineal"`, se obtienen los cuatro pixeles posibles x0, y0, x1, y1 (donde x0 es el píxel de la izquierda a (x, y) e y0 es el píxel de arriba; y x1 = x0+1 e y1 = y0+1). Se calcula la distancia entre x y x0 e y e y0 (llamados diferenciales dx, dy) y los pesos son, matemáticamente, (1-dx), dx y análogo para y. Se retornan las tuplas de pesos y la tupla con los cuatro pixeles.
+
+5. *reescalamiento*: recibe el factor de escalamiento s, la dirección relativa a la imagen, el tipo de imagen y el modo de interpolación. Primero, revisa que el modo de interpolación sea válido ("bilineal", "vecino") o variaciones de mayúsculas. Luego se consigue el tensor de la imagen con *convertir_a_rgb* y sus tamaños máximos con el atributo `.shape` de nuevo. Se extrae el lienzo vacío (tamaño escalado) junto a sus dimensiones con *generar_lienzo_salida* Después, se entra a dos bucles for. Se itera en y, luego en x en el rango de las dimensiones máximas del nuevo lienzo. Se desempaqueta la salida de *calcular_nuevas_coordenadas* según el modo:
+    - Bilineal: se extraen las tuplas de peso w_x y w_y, junto a los cuatro pixeles posibles. Para cada combinación de los pares x0, y0, x1, y1 se calcula el color de cada pixel llamando a la imagen original y finalmente, sumando. Este valor es luego asignado en el lienzo vacío para las coordenadas x, y sobre las que se itera.
+    - Vecino: Se extrae los pixeles promediados x_p, y_p y se asigna el mismo color de la imagne en x_p, y_p al lienzo en x, y
+- Finalmente, se retorna el lienzo vacío usando `.astype(np.uint8)` y la imagen original
+
 ###### Enlace al repo: [Enlace](https://github.com/Oikkoi/T1_Imagenes.git)

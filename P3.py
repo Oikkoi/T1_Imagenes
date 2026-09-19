@@ -25,7 +25,7 @@ def convertir_a_rgb(file: str, tipo: str):  # Cubre RGB, HSV, HSL, HSI y GraySca
     return img_as_ubyte(imagen_rgb)
 
 
-def generar_lienzo_salida(s: float, imagen_original, tipo="rgb"):
+def generar_lienzo_salida(s: float, imagen_original):
     alto_og, ancho_og, _ = imagen_original.shape
     y_max, x_max = (int(np.ceil(alto_og*s)), int(np.ceil(ancho_og*s)))
     return np.zeros((y_max, x_max, 3)), (x_max, y_max)

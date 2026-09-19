@@ -162,5 +162,4 @@ for imagen in ("im_venecia.avif", "im_cocina.jpg", "im_ciudad.jpg"):
 """
 
 # Exp 8:
-varios_test(("im_ciudad_ruido.png", "raiseerror"),
-            (0.3, 0.5, 1.5, 1.7), "rgba")
+# varios_test(("im_ciudad_ruido.png", "raiseerror"), 0.3, 0.5, 1.5, 1.7), "rgba")
